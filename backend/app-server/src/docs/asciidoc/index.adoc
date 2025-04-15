@@ -1,0 +1,39 @@
+= Sample API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+== 개요
+
+이 문서는 Sample API에 대한 문서입니다.
+
+== API 엔드포인트
+
+=== GET Hello
+
+`GET /api/sample/hello` 엔드포인트는 간단한 인사말 메시지를 반환합니다.
+
+==== 요청
+include::{snippets}/get-hello/http-request.adoc[]
+
+==== 응답
+include::{snippets}/get-hello/http-response.adoc[]
+
+=== POST Hello
+
+`POST /api/sample/hello` 엔드포인트는 이름을 받아 맞춤형 인사말을 반환합니다.
+
+==== 요청
+include::{snippets}/post-hello/http-request.adoc[]
+
+==== 요청 필드
+include::{snippets}/post-hello/request-fields.adoc[]
+
+==== 응답
+include::{snippets}/post-hello/http-response.adoc[]
+
+==== 응답 필드
+include::{snippets}/post-hello/response-fields.adoc[]
