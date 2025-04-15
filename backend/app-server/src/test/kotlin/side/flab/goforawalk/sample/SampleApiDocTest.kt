@@ -37,7 +37,6 @@ class SampleApiDocTest {
     fun `get-hello`() {
         mockMvc.perform(
             get("/api/sample/hello")
-                .accept(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk)
             .andDo(docs)  // 기본 설정된 docs 사용 (method-name 패턴 적용)
