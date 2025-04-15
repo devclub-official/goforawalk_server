@@ -60,10 +60,29 @@ tasks.withType<Test> {
 }
 
 tasks.test {
-    outputs.dir(project.extra["snippetsDir"]!!)
+    outputs.dir(project.extra["snippetsDir"]!!) // 테스트 실행 시 스니펫 출력 디렉토리 지정
 }
 
 tasks.asciidoctor {
-    inputs.dir(project.extra["snippetsDir"]!!)
-    dependsOn(tasks.test)
+    dependsOn(tasks.test) // 테스트 수행 후 스니펫 생성
+
+    attributes(
+        mapOf(
+            "snippets" to project.extra["snippetsDir"],
+        )
+    )
+}
+
+tasks.bootJar {
+    dependsOn(tasks.asciidoctor) // JAR 파일 생성 전 asciidoctor 문서 생성
+    doFirst {
+        // 기존 문서 삭제
+        delete("src/main/resources/static/docs")
+        
+        // 새로운 문서 복사
+        copy {
+            from("${tasks.asciidoctor.get().outputDir}")
+            into("src/main/resources/static/docs")
+        }
+    }
 }
