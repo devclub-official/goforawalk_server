@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/sample")
+@RequestMapping("/sample")
 class SampleApi {
     @GetMapping("/hello")
     fun helloWorld(): String {

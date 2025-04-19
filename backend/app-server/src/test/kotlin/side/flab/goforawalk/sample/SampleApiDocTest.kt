@@ -36,7 +36,7 @@ class SampleApiDocTest {
     @Test
     fun `get-hello`() {
         mockMvc.perform(
-            get("/api/sample/hello")
+            get("/sample/hello")
         )
             .andExpect(status().isOk)
             .andDo(docs)  // 기본 설정된 docs 사용 (method-name 패턴 적용)
@@ -47,7 +47,7 @@ class SampleApiDocTest {
         val request = SampleApi.HelloRequest("테스터")
 
         mockMvc.perform(
-            post("/api/sample/hello")
+            post("/sample/hello")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .accept(MediaType.APPLICATION_JSON)
