@@ -14,7 +14,7 @@ COPY src src
 RUN chmod +x ./gradlew
 
 # 빌드 실행
-RUN ./gradlew build --no-daemon -x test
+RUN ./gradlew build -x test
 
 # 실행 스테이지
 FROM eclipse-temurin:17-jdk
