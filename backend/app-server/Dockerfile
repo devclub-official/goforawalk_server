@@ -7,8 +7,8 @@ WORKDIR /app
 COPY gradle/wrapper/gradle-wrapper.jar gradle/wrapper/
 COPY gradle/wrapper/gradle-wrapper.properties gradle/wrapper/
 COPY gradlew .
-COPY build.gradle .
-COPY settings.gradle .
+COPY build.gradle.kts .
+COPY settings.gradle.kts .
 
 # Wrapper 실행 권한 부여
 RUN chmod +x ./gradlew
