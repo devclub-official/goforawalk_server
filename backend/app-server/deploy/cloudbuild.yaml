@@ -1,0 +1,37 @@
+steps:
+  - name: 'gcr.io/cloud-builders/gcloud'  # Cloud Build에서 제공하는 gcloud 도구 사용
+    entrypoint: 'bash'  # bash 셸을 사용하여 명령 실행
+    args:
+      - '-c'  # 다음 인자를 명령어로 해석
+      - |
+        # 환경변수 사용하여 SSH 명령 실행
+        gcloud compute ssh ${_SSH_USER}@${_INSTANCE_NAME} --zone ${_LOCATION} --project ${_PROJECT_ID} --command '
+        
+          # Docker 시스템 정리 (불필요한 이미지, 컨테이너 등 삭제)
+          docker system prune -a -f && \
+        
+          # 프로젝트 디렉토리로 이동 (없으면 생성)
+          if [ ! -d "/home/gfw" ]; then
+            echo ">>>>> 디렉토리 생성 중..."
+            mkdir -p /home/gfw
+            cd /home/gfw
+            git clone https://github.com/devclub-official/goforawalk_server .
+          else
+            cd /home/gfw
+          fi && \
+        
+          # (Git) 지정된 브랜치로 소스 업데이트
+          git fetch origin ${BRANCH_NAME} && \
+          git reset --hard origin/${BRANCH_NAME} && \
+        
+          # 애플리케이션 디렉토리로 이동
+          cd /home/gfw/backend/app-server && \
+        
+          # Docker Compose에서 사용할 환경 변수 설정
+          export BOOT_IMAGE=app-server:latest && \  # 백엔드 이미지 이름
+        
+          echo ">>>>> docker-compose 실행... " && \
+          docker-compose up -d --build
+        '
+options:
+  logging: CLOUD_LOGGING_ONLY  # 로그를 Cloud Logging에만 저장 (기본 로그 스토리지 비용 절감)
