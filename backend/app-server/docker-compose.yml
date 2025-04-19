@@ -1,23 +1,16 @@
 version: "3.8"
 
 services:
-  app-server: # 서비스 이름 (app-server라는 이름으로 서비스 정의)
-    build: # 빌드 설정: 이미지를 직접 빌드하기 위한 설정
-      context: . # 빌드 컨텍스트
-      dockerfile: Dockerfile # 사용할 Dockerfile 위치 지정
-
-    image: app-server:latest # 빌드된 이미지 이름과 태그 지정 (이미지 이름:태그 형식)
-
-    container_name: app-server-container # 실행될 컨테이너 이름 지정 (이 이름으로 Docker에서 식별됨)
-
-    restart: always # 컨테이너 재시작 정책 (always: 항상 재시작, 서버 재부팅이나 오류 발생 시에도)
-
+  app-server: # 서비스 이름
+    build: # 빌드 설정
+      context: .
+      dockerfile: Dockerfile
+    image: app-server:latest # 빌드된 이미지 이름과 태그
+    container_name: app-server-container # 실행될 컨테이너 이름
+    restart: always # 컨테이너 재시작 정책
     ports:
-      - "8080:8080" # 포트 매핑 (호스트의 8080 포트를 컨테이너의 8080 포트와 연결)
-
+      - "8080:8080" # 포트 매핑
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-
-    # 볼륨 설정 (데이터 영속성을 위한 설정)
-    volumes:
-      - ./upload:/app/upload # 호스트의 ./upload 디렉토리를 컨테이너의 /app/upload 디렉토리와 연결(컨테이너가 재시작되어도 업로드된 파일들이 유지)
+    volumes: # 런타임에 필요한 볼륨 설정 (데이터 영속성 등)
+      - ./upload:/app/upload # 호스트의 ./upload 디렉토리를 컨테이너의 /app/upload와 연결

@@ -1,32 +1,36 @@
-# 빌드 스테이지: JDK 17과 함께 Gradle 8.13 사용
-FROM eclipse-temurin:17-jdk AS build
+# 1단계: 컴파일 (Compiler)
+FROM eclipse-temurin:17-jdk as compiler
 
-WORKDIR /app
+# 프로젝트의 모든 파일을 복사
+COPY . .
 
-# 필요한 파일들만 복사
-COPY gradle gradle
-COPY gradlew .
-COPY build.gradle.kts .
-COPY settings.gradle.kts .
-COPY src src
-
-# Wrapper 실행 권한 부여
 RUN chmod +x ./gradlew
 
-# 빌드 실행
-RUN ./gradlew build -x test
+RUN ./gradlew bootJar
 
-# 실행 스테이지
+# 2단계: 빌더 및 Layered JAR 추출 (Builder & Extractor)
+FROM eclipse-temurin:17-jdk as builder
+
+# 컴파일 단계에서 빌드된 JAR 파일을 복사
+COPY --from=compiler build/libs/app-server.jar ./
+
+# Layered JAR에서 레이어별로 파일을 추출
+RUN java -Djarmode=layertools -jar app-server.jar extract
+
+# 3단계: 최종 Docker 이미지 생성 (Final Image)
+# 추출된 레이어들과 필요한 기본 환경을 설정하여 최종 이미지를 Todtjd
 FROM eclipse-temurin:17-jdk
 
-# 실행 환경에서 사용할 작업 디렉토리를 /app으로 설정
+# 애플리케이션 실행을 위한 사용자 및 작업 디렉토리 생성/설정
+RUN useradd -m app
+USER app
 WORKDIR /app
 
-# 빌드 스테이지에서 생성된 JAR 파일을 실행 환경으로 복사
-COPY --from=build /app/build/libs/*.jar app.jar
+COPY --chown=app --from=builder dependencies/ ./
+COPY --chown=app --from=builder snapshot-dependencies/ ./
+COPY --chown=app --from=builder spring-boot-loader/ ./
+COPY --chown=app --from=builder application/ ./
 
-# 컨테이너는 8080 포트 사용
 EXPOSE 8080
 
-# 컨테이너 시작 시 실행할 명령
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
