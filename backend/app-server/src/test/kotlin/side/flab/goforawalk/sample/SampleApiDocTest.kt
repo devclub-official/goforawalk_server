@@ -1,6 +1,7 @@
 package side.flab.goforawalk.sample
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
@@ -19,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import side.flab.goforawalk.config.RestDocsConfiguration
 
+@Tag("restdocs")
 @WebMvcTest(SampleApi::class)
 @AutoConfigureRestDocs
 @Import(RestDocsConfiguration::class)
@@ -36,7 +38,7 @@ class SampleApiDocTest {
     @Test
     fun `get-hello`() {
         mockMvc.perform(
-            get("/api/sample/hello")
+            get("/sample/hello")
         )
             .andExpect(status().isOk)
             .andDo(docs)  // 기본 설정된 docs 사용 (method-name 패턴 적용)
@@ -47,7 +49,7 @@ class SampleApiDocTest {
         val request = SampleApi.HelloRequest("테스터")
 
         mockMvc.perform(
-            post("/api/sample/hello")
+            post("/sample/hello")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .accept(MediaType.APPLICATION_JSON)
