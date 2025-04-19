@@ -88,6 +88,9 @@ tasks.asciidoctor {
 }
 
 tasks.bootJar {
+    archiveBaseName.set("app-server")
+    archiveVersion.set("")
+
     dependsOn(tasks.asciidoctor) // JAR 파일 생성 전 asciidoctor 문서 생성
     doFirst {
         // 기존 문서 삭제
