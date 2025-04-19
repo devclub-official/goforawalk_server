@@ -31,7 +31,7 @@ steps:
           export BOOT_IMAGE=app-server:latest && \  # 백엔드 이미지 이름
         
           echo ">>>>> docker-compose 실행... " && \
-          docker-compose up -d --build
+          docker compose up -d --build \ # 백그라운드에서 항상 새로 빌드.
         '
 options:
   logging: CLOUD_LOGGING_ONLY  # 로그를 Cloud Logging에만 저장 (기본 로그 스토리지 비용 절감)
