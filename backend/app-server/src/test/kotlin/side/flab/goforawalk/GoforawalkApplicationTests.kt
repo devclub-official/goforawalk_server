@@ -8,6 +8,7 @@ class GoforawalkApplicationTests {
 
     @Test
     fun contextLoads() {
+        println("test")
     }
 
 }
