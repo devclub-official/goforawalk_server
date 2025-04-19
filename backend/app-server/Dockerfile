@@ -4,10 +4,11 @@ FROM eclipse-temurin:17-jdk AS build
 WORKDIR /app
 
 # Gradle Wrapper와 의존성 캐싱을 위한 레이어 최적화
-COPY gradle gradle
+COPY gradle/wrapper/gradle-wrapper.jar gradle/wrapper/
+COPY gradle/wrapper/gradle-wrapper.properties gradle/wrapper/
 COPY gradlew .
-COPY settings.gradle.kts .
-COPY build.gradle.kts .
+COPY build.gradle .
+COPY settings.gradle .
 
 # Wrapper 실행 권한 부여
 RUN chmod +x ./gradlew
