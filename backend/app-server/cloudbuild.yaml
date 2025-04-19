@@ -8,12 +8,13 @@ steps:
         gcloud compute ssh ${_SSH_USER}@${_INSTANCE_NAME} --zone ${_LOCATION} --project ${_PROJECT_ID} --command '
         
           # Docker 시스템 정리 (불필요한 이미지, 컨테이너 등 삭제)
-          docker system prune -a -f && \
+          sudo docker system prune -a -f && \
         
           # 프로젝트 디렉토리로 이동 (없으면 생성)
           if [ ! -d "/home/gfw" ]; then
             echo ">>>>> 디렉토리 생성 중..."
-            mkdir -p /home/gfw
+            sudo mkdir -p /home/gfw
+            sudo chown $(whoami):$(whoami) /home/gfw
             cd /home/gfw
             git clone https://github.com/devclub-official/goforawalk_server .
           else
@@ -28,10 +29,10 @@ steps:
           cd /home/gfw/backend/app-server && \
         
           # Docker Compose에서 사용할 환경 변수 설정
-          export BOOT_IMAGE=app-server:latest && \  # 백엔드 이미지 이름
+          export BOOT_IMAGE=app-server:latest && \
         
           echo ">>>>> docker-compose 실행... " && \
-          docker compose up -d --build \ # 백그라운드에서 항상 새로 빌드.
+          sudo docker compose up -d --build
         '
 options:
   logging: CLOUD_LOGGING_ONLY  # 로그를 Cloud Logging에만 저장 (기본 로그 스토리지 비용 절감)
