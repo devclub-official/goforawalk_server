@@ -19,9 +19,6 @@ steps:
         echo ">>>>> 임시 디렉토리 생성 및 소스 코드 체크아웃 시작..." && \
         echo "현재 디렉토리: $(pwd)" && \
         
-        echo "Current Directory structure:" && \
-        find /workspace -type f -o -type d | sort && \
-        
         echo ">>>>> 소스 코드 체크아웃 완료"
 
 
@@ -52,9 +49,7 @@ steps:
         echo ">>> ./gradlew bootJar" && \
         ./gradlew bootJar && \
         
-        echo ">>>>> JAR 빌드 완료" && \
-        echo ">>>>> 빌드된 JAR 파일: " && \
-        ls -la build/libs/
+        echo ">>>>> JAR 빌드 완료" \
     waitFor: [ 'checkout-source' ]
 
     # 1.5: 원격 인스턴스에 디렉토리 생성 (SCP 전에 실행)
@@ -71,7 +66,7 @@ steps:
           sudo rm -rf ${_REMOTE_DEPLOY_DIR} && \
           sudo mkdir -p ${_REMOTE_DEPLOY_DIR} && \
           sudo chown -R ${_SSH_USER}:${_SSH_USER} ${_REMOTE_DEPLOY_DIR} && \
-          sudo chmod u+w ${_REMOTE_DEPLOY_DIR} &&
+          sudo chmod u+w ${_REMOTE_DEPLOY_DIR} && \
           echo ">>>>> 디렉토리 생성 완료"
         '
     waitFor: [ 'build-jar' ]# 소스 코드 체크아웃 완료 후 실행
