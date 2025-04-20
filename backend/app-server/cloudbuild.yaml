@@ -108,22 +108,22 @@ steps:
         echo ">>>>> [${_INSTANCE_NAME}] 인스턴스 접속 대기 중..." && \
         
         gcloud compute ssh ${_SSH_USER}@${_INSTANCE_NAME} --zone=${_LOCATION} --project=${_PROJECT_ID} --command='
-          set -e \
+          set -e && 
         
-          echo ">>>>> [${_INSTANCE_NAME}] 인스턴스 접속 성공!!!" && \ 
+          echo ">>>>> [${_INSTANCE_NAME}] 인스턴스 접속 성공!!!" &&  
         
-          echo ">>>>> Changing directory to ${_REMOTE_DEPLOY_DIR}..." && \ 
-          cd ${_REMOTE_DEPLOY_DIR} && \ 
-          echo "Current remote directory: $(pwd)" && \ 
+          echo ">>>>> Changing directory to ${_REMOTE_DEPLOY_DIR}..." &&  
+          cd ${_REMOTE_DEPLOY_DIR} &&  
+          echo "Current remote directory: $(pwd)" &&  
         
-          echo ">>>>> Pruning old Docker images..." && \ 
-          sudo docker image prune -f &&  \
+          echo ">>>>> Pruning old Docker images..." &&  
+          sudo docker image prune -f && 
         
-          echo ">>>>> Building Docker image using docker-compose.yml and Dockerfile..." && \ 
-          sudo docker compose up --build && \ 
+          echo ">>>>> Building Docker image using docker-compose.yml and Dockerfile..." &&  
+          sudo docker compose up --build &&
         
-          echo ">>>>> (Re)Starting container using docker-compose..." && \
-          sudo docker compose up -d && \
+          echo ">>>>> (Re)Starting container using docker-compose..." &&
+          sudo docker compose up -d &&
         
           echo ">>>>> Remote deployment script finished successfully."
         '
