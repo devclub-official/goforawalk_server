@@ -17,7 +17,7 @@ class RestDocsConfiguration {
                 Preprocessors.prettyPrint(),
                 Preprocessors.modifyHeaders()
                     .remove("Content-Length")
-                    .set("Host", "35.216.69.99:8080")
+                    .set("Host", "https://api.goforawalk.site")
             ),
             Preprocessors.preprocessResponse(
                 Preprocessors.prettyPrint(),

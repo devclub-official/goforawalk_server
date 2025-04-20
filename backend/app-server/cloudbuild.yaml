@@ -1,0 +1,125 @@
+substitutions:
+  _BRANCH_NAME: 'main'                # 기본 브랜치 이름
+  _INSTANCE_NAME: 'goforawalk-server' # 배포할 GCE 인스턴스 이름
+  _LOCATION: 'asia-northeast3-a'      # GCE 인스턴스 위치 (존)
+  _SSH_USER: 'shineecard2'                    # SSH 접속 사용자 계정
+  _REMOTE_DEPLOY_DIR: '/home/${_SSH_USER}/app' # 원격 배포 디렉토리
+  _SOURCE_DIR: '/workspace/backend/app-server'            # 소스 코드 체크아웃 디렉토리
+
+steps:
+  # 0: 임시 디렉토리 생성 및 소스 코드 체크아웃
+  - name: 'gcr.io/cloud-builders/git'
+    id: 'checkout-source'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        set -e # 명령어 실패 시 스크립트 중단
+        git log
+        echo ">>>>> 임시 디렉토리 생성 및 소스 코드 체크아웃 시작..." && \
+        echo "현재 디렉토리: $(pwd)" && \
+        
+        echo ">>>>> 소스 코드 체크아웃 완료"
+
+
+  # 1: Gradle Wrapper를 사용하여 JAR 빌드
+  - name: 'eclipse-temurin:17-jdk' # JDK 17 이미지 사용
+    id: 'build-jar'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        set -e # 명령어 실패 시 스크립트 중단
+        echo ">>>>> Gradle Wrapper로 빌드 시작..." && \
+        
+        echo "현재 디렉토리: $(pwd)" && \
+        
+        # 정확한 경로로 이동
+        cd ${_SOURCE_DIR} && \
+        
+        # 이동 후 현재 디렉토리 확인
+        echo "빌드 시작전 현재 디렉토리: $(pwd)" && \
+        
+        ls -la && \
+        
+        # Gradle Wrapper에 실행 권한 부여
+        chmod +x ./gradlew && \
+        
+        # 테스트를 스킵하고 빌드 실행
+        echo ">>> ./gradlew bootJar" && \
+        ./gradlew bootJar && \
+        
+        echo ">>>>> JAR 빌드 완료" \
+    waitFor: [ 'checkout-source' ]
+
+    # 1.5: 원격 인스턴스에 디렉토리 생성 (SCP 전에 실행)
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-remote-dir'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo ">>>>> 원격 서버에 디렉토리 생성 시작..." && \
+        gcloud compute ssh ${_SSH_USER}@${_INSTANCE_NAME} --zone=${_LOCATION} --project=${_PROJECT_ID} --command='
+          set -e
+          echo ">>>>> 디렉토리 생성: ${_REMOTE_DEPLOY_DIR}" && \
+          sudo rm -rf ${_REMOTE_DEPLOY_DIR} && \
+          sudo mkdir -p ${_REMOTE_DEPLOY_DIR} && \
+          sudo chown -R ${_SSH_USER}:${_SSH_USER} ${_REMOTE_DEPLOY_DIR} && \
+          sudo chmod u+w ${_REMOTE_DEPLOY_DIR} && \
+          echo ">>>>> 디렉토리 생성 완료"
+        '
+    waitFor: [ 'build-jar' ]# 소스 코드 체크아웃 완료 후 실행
+
+  # 2: 빌드된 JAR 및 원격 실행용 파일들을 원격 인스턴스의 배포 디렉토리로 복사
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'scp-files'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo ">>>>> 현재 작업 디렉토리: " && pwd && \
+        
+        echo ">>>>> SCP로 파일 전송을 시작한다!!!: " && \
+        gcloud compute scp \
+          --project=${_PROJECT_ID} \
+          --zone=${_LOCATION} \
+          --recurse \
+          ${_SOURCE_DIR}/build/libs/app-server.jar \
+          ${_SOURCE_DIR}/docker-remote/Dockerfile \
+          ${_SOURCE_DIR}/docker-remote/docker-compose.yml \
+          ${_SOURCE_DIR}/docker-remote/docker-run.sh \
+          ${_SSH_USER}@${_INSTANCE_NAME}:${_REMOTE_DEPLOY_DIR} && \
+        
+        echo ">>>>> SCP로 파일 전송 완료!!!"
+    waitFor: [ 'create-remote-dir' ]
+
+  # 3단계: 원격 인스턴스에 SSH 접속하여 배포 디렉토리에서 Docker Compose 실행
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'deploy-remote'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo ">>>>> [${_INSTANCE_NAME}] 인스턴스 접속 대기 중..." && \
+        
+        gcloud compute ssh ${_SSH_USER}@${_INSTANCE_NAME} --zone=${_LOCATION} --project=${_PROJECT_ID} --command='
+          set -e && 
+        
+          echo ">>>>> [${_INSTANCE_NAME}] 인스턴스 접속 성공!!!" &&  
+        
+          echo ">>>>> Changing directory to ${_REMOTE_DEPLOY_DIR}..." &&  
+          cd ${_REMOTE_DEPLOY_DIR} &&  
+          echo "Current remote directory: $(pwd)" &&  
+        
+          echo ">>>>> 배포 스크립트 실행 권한 설정..." &&
+          chmod +x docker-run.sh &&
+        
+          echo ">>>>> Docker 컨테이너 배포 시작..." &&
+          ./docker-run.sh &&
+        
+          echo ">>>>> Remote deployment script finished successfully."
+        '
+    waitFor: [ 'scp-files' ]           # 파일 전송 완료 후 실행
+options:
+  logging: CLOUD_LOGGING_ONLY # 로그는 Cloud Logging에만 저장 (스토리지 비용 절감)

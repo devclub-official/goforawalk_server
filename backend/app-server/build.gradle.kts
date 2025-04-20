@@ -55,16 +55,30 @@ allOpen {
     annotation("jakarta.persistence.Embeddable")
 }
 
+tasks.jar {
+    enabled = false
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-tasks.test {
-    outputs.dir(project.extra["snippetsDir"]!!) // 테스트 실행 시 스니펫 출력 디렉토리 지정
+// build.gradle.kts에 추가
+tasks.register<Test>("generateRestDocs") {
+    description = "문서 생성용 테스트만 실행합니다"
+    group = "documentation"
+
+    useJUnitPlatform {
+        includeTags("restdocs")  // @Tag("restdocs") 붙은 테스트만 실행
+    }
+
+    // 스니펫 출력 디렉토리 설정
+    outputs.dir(project.extra["snippetsDir"]!!)
 }
 
+
 tasks.asciidoctor {
-    dependsOn(tasks.test) // 테스트 수행 후 스니펫 생성
+    dependsOn(tasks.named("generateRestDocs")) // 테스트 수행 후 스니펫 생성
 
     attributes(
         mapOf(
@@ -74,6 +88,9 @@ tasks.asciidoctor {
 }
 
 tasks.bootJar {
+    archiveBaseName.set("app-server")
+    archiveVersion.set("")
+
     dependsOn(tasks.asciidoctor) // JAR 파일 생성 전 asciidoctor 문서 생성
     doFirst {
         // 기존 문서 삭제
