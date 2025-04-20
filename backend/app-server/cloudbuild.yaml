@@ -117,9 +117,6 @@ steps:
           cd ${_REMOTE_DEPLOY_DIR} &&  
           echo "Current remote directory: $(pwd)" &&  
         
-          echo ">>>>> Pruning old Docker images..." &&  
-          sudo docker image prune -f && 
-        
           echo ">>>>> 배포 스크립트 실행 권한 설정..." &&
           chmod +x docker-run.sh &&
         

@@ -1,6 +1,4 @@
 # docker-compose.yml (원격 인스턴스용)
-version: "3.8"
-
 services:
   app-server: # 서비스 이름
     build: # 빌드 설정
