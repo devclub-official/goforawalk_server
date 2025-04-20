@@ -14,8 +14,6 @@
 
 === GET Hello
 
-`GET /api/sample/hello` 엔드포인트는 간단한 인사말 메시지를 반환합니다.
-
 ==== 요청
 include::{snippets}/get-hello/http-request.adoc[]
 
@@ -23,9 +21,6 @@ include::{snippets}/get-hello/http-request.adoc[]
 include::{snippets}/get-hello/http-response.adoc[]
 
 === POST Hello
-
-`POST /api/sample/hello` 엔드포인트는 이름을 받아 맞춤형 인사말을 반환합니다.
-
 ==== 요청
 include::{snippets}/post-hello/http-request.adoc[]
 
