@@ -70,7 +70,7 @@ steps:
           echo ">>>>> 디렉토리 생성: ${_REMOTE_DEPLOY_DIR}" && \
           sudo rm -rf ${_REMOTE_DEPLOY_DIR} && \
           sudo mkdir -p ${_REMOTE_DEPLOY_DIR} && \
-          sudo chown -R ${USER}:${USER} ${_REMOTE_DEPLOY_DIR} && \
+          sudo chown -R ${_SSH_USER}:${_SSH_USER} ${_REMOTE_DEPLOY_DIR} && \
           sudo chmod u+w ${_REMOTE_DEPLOY_DIR} &&
           echo ">>>>> 디렉토리 생성 완료"
         '
