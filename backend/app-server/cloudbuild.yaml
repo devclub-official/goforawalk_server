@@ -3,7 +3,7 @@ substitutions:
   _INSTANCE_NAME: 'goforawalk-server' # 배포할 GCE 인스턴스 이름
   _LOCATION: 'asia-northeast3-a'      # GCE 인스턴스 위치 (존)
   _SSH_USER: 'shineecard2'                    # SSH 접속 사용자 계정
-  _REMOTE_DEPLOY_DIR: '/home/gfw/backend/app-server' # 원격 배포 디렉토리
+  _REMOTE_DEPLOY_DIR: '/home/${_SSH_USER}/app' # 원격 배포 디렉토리
   _SOURCE_DIR: '/workspace/backend/app-server'            # 소스 코드 체크아웃 디렉토리
 
 steps:
@@ -55,7 +55,26 @@ steps:
         echo ">>>>> JAR 빌드 완료" && \
         echo ">>>>> 빌드된 JAR 파일: " && \
         ls -la build/libs/
-    waitFor: [ 'checkout-source' ]     # 소스 코드 체크아웃 완료 후 실행
+    waitFor: [ 'checkout-source' ]
+
+    # 1.5: 원격 인스턴스에 디렉토리 생성 (SCP 전에 실행)
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-remote-dir'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo ">>>>> 원격 서버에 디렉토리 생성 시작..." && \
+        gcloud compute ssh ${_SSH_USER}@${_INSTANCE_NAME} --zone=${_LOCATION} --project=${_PROJECT_ID} --command='
+          set -e
+          echo ">>>>> 디렉토리 생성: ${_REMOTE_DEPLOY_DIR}" && \
+          sudo rm -rf ${_REMOTE_DEPLOY_DIR} && \
+          sudo mkdir -p ${_REMOTE_DEPLOY_DIR} && \
+          sudo chown -R ${USER}:${USER} ${_REMOTE_DEPLOY_DIR} && \
+          sudo chmod u+w ${_REMOTE_DEPLOY_DIR} &&
+          echo ">>>>> 디렉토리 생성 완료"
+        '
+    waitFor: [ 'build-jar' ]# 소스 코드 체크아웃 완료 후 실행
 
   # 2: 빌드된 JAR 및 원격 실행용 파일들을 원격 인스턴스의 배포 디렉토리로 복사
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -75,9 +94,9 @@ steps:
           ${_SOURCE_DIR}/docker-remote/Dockerfile \
           ${_SOURCE_DIR}/docker-remote/docker-compose.yml \
           ${_SSH_USER}@${_INSTANCE_NAME}:${_REMOTE_DEPLOY_DIR} && \
-            
-        echo ">>>>> SCP로 파일 전송 완료!!!" && \
-    waitFor: [ 'build-jar' ] # JAR 빌드 완료 후 실행
+        
+        echo ">>>>> SCP로 파일 전송 완료!!!"
+    waitFor: [ 'create-remote-dir' ]
 
   # 3단계: 원격 인스턴스에 SSH 접속하여 배포 디렉토리에서 Docker Compose 실행
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -89,25 +108,25 @@ steps:
         echo ">>>>> [${_INSTANCE_NAME}] 인스턴스 접속 대기 중..." && \
         
         gcloud compute ssh ${_SSH_USER}@${_INSTANCE_NAME} --zone=${_LOCATION} --project=${_PROJECT_ID} --command='
-          set -e
+          set -e \
         
-          echo ">>>>> [${_INSTANCE_NAME}] 인스턴스 접속 성공!!!" && \
-
-          echo ">>>>> Changing directory to ${_REMOTE_DEPLOY_DIR}..." && \
-          cd ${_REMOTE_DEPLOY_DIR} && \
-          echo "Current remote directory: $(pwd)" && \
-
-          echo ">>>>> Pruning old Docker images..." && \
-          sudo docker image prune -f && \
-
-          echo ">>>>> Building Docker image using docker-compose.yml and Dockerfile..." && \
-          sudo docker compose up --build && \
-
+          echo ">>>>> [${_INSTANCE_NAME}] 인스턴스 접속 성공!!!" && \ 
+        
+          echo ">>>>> Changing directory to ${_REMOTE_DEPLOY_DIR}..." && \ 
+          cd ${_REMOTE_DEPLOY_DIR} && \ 
+          echo "Current remote directory: $(pwd)" && \ 
+        
+          echo ">>>>> Pruning old Docker images..." && \ 
+          sudo docker image prune -f &&  \
+        
+          echo ">>>>> Building Docker image using docker-compose.yml and Dockerfile..." && \ 
+          sudo docker compose up --build && \ 
+        
           echo ">>>>> (Re)Starting container using docker-compose..." && \
           sudo docker compose up -d && \
-
+        
           echo ">>>>> Remote deployment script finished successfully."
-    waitFor: [ 'scp-files' ] # 파일 복사 완료 후 실행
-
+        '
+    waitFor: [ 'scp-files' ]           # 파일 전송 완료 후 실행
 options:
   logging: CLOUD_LOGGING_ONLY # 로그는 Cloud Logging에만 저장 (스토리지 비용 절감)
