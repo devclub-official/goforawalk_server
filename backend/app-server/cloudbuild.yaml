@@ -1,45 +1,113 @@
+substitutions:
+  _BRANCH_NAME: 'main'                # 기본 브랜치 이름
+  _INSTANCE_NAME: 'goforawalk-server' # 배포할 GCE 인스턴스 이름
+  _LOCATION: 'asia-northeast3-a'      # GCE 인스턴스 위치 (존)
+  _SSH_USER: 'shineecard2'                    # SSH 접속 사용자 계정
+  _REMOTE_DEPLOY_DIR: '/home/gfw/backend/app-server' # 원격 배포 디렉토리
+  _SOURCE_DIR: '/workspace/backend/app-server'            # 소스 코드 체크아웃 디렉토리
+
 steps:
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'  # bash 셸을 사용하여 명령 실행
+  # 0: 임시 디렉토리 생성 및 소스 코드 체크아웃
+  - name: 'gcr.io/cloud-builders/git'
+    id: 'checkout-source'
+    entrypoint: 'bash'
     args:
-      - '-c'  # 다음 인자를 명령어로 해석
+      - '-c'
       - |
-        # 환경변수 사용하여 SSH 명령 실행
-        gcloud compute ssh ${_SSH_USER}@${_INSTANCE_NAME} --zone ${_LOCATION} --project ${_PROJECT_ID} --command '
-          set -e # 명령어 실패 시 즉시 종료
+        set -e # 명령어 실패 시 스크립트 중단
+        git log
+        echo ">>>>> 임시 디렉토리 생성 및 소스 코드 체크아웃 시작..." && \
+        echo "현재 디렉토리: $(pwd)" && \
+        
+        echo "Current Directory structure:" && \
+        find /workspace -type f -o -type d | sort && \
+        
+        echo ">>>>> 소스 코드 체크아웃 완료"
 
-          echo ">>>>> 원격 서버에서 Git 업데이트 및 Docker Compose 빌드/실행 <<<<<"
 
-          echo ">>>>> Docker 이미지 정리 중..." && \
+  # 1: Gradle Wrapper를 사용하여 JAR 빌드
+  - name: 'eclipse-temurin:17-jdk' # JDK 17 이미지 사용
+    id: 'build-jar'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        set -e # 명령어 실패 시 스크립트 중단
+        echo ">>>>> Gradle Wrapper로 빌드 시작..." && \
+        
+        echo "현재 디렉토리: $(pwd)" && \
+        
+        # 정확한 경로로 이동
+        cd ${_SOURCE_DIR} && \
+        
+        # 이동 후 현재 디렉토리 확인
+        echo "빌드 시작전 현재 디렉토리: $(pwd)" && \
+        
+        ls -la && \
+        
+        # Gradle Wrapper에 실행 권한 부여
+        chmod +x ./gradlew && \
+        
+        # 테스트를 스킵하고 빌드 실행
+        echo ">>> ./gradlew bootJar" && \
+        ./gradlew bootJar && \
+        
+        echo ">>>>> JAR 빌드 완료" && \
+        echo ">>>>> 빌드된 JAR 파일: " && \
+        ls -la build/libs/
+    waitFor: [ 'checkout-source' ]     # 소스 코드 체크아웃 완료 후 실행
+
+  # 2: 빌드된 JAR 및 원격 실행용 파일들을 원격 인스턴스의 배포 디렉토리로 복사
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'scp-files'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo ">>>>> 현재 작업 디렉토리: " && pwd && \
+        
+        echo ">>>>> SCP로 파일 전송을 시작한다!!!: " && \
+        gcloud compute scp \
+          --project=${_PROJECT_ID} \
+          --zone=${_LOCATION} \
+          --recurse \
+          ${_SOURCE_DIR}/build/libs/app-server.jar \
+          ${_SOURCE_DIR}/docker-remote/Dockerfile \
+          ${_SOURCE_DIR}/docker-remote/docker-compose.yml \
+          ${_SSH_USER}@${_INSTANCE_NAME}:${_REMOTE_DEPLOY_DIR} && \
+            
+        echo ">>>>> SCP로 파일 전송 완료!!!" && \
+    waitFor: [ 'build-jar' ] # JAR 빌드 완료 후 실행
+
+  # 3단계: 원격 인스턴스에 SSH 접속하여 배포 디렉토리에서 Docker Compose 실행
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'deploy-remote'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo ">>>>> [${_INSTANCE_NAME}] 인스턴스 접속 대기 중..." && \
+        
+        gcloud compute ssh ${_SSH_USER}@${_INSTANCE_NAME} --zone=${_LOCATION} --project=${_PROJECT_ID} --command='
+          set -e
+        
+          echo ">>>>> [${_INSTANCE_NAME}] 인스턴스 접속 성공!!!" && \
+
+          echo ">>>>> Changing directory to ${_REMOTE_DEPLOY_DIR}..." && \
+          cd ${_REMOTE_DEPLOY_DIR} && \
+          echo "Current remote directory: $(pwd)" && \
+
+          echo ">>>>> Pruning old Docker images..." && \
           sudo docker image prune -f && \
 
-          echo ">>>>> 프로젝트 디렉토리로 이동 중...(없으면 생성)" && \
-          if [ ! -d "/home/gfw" ]; then
-            echo ">>>>> /home/gfw 디렉토리 생성 중..."
-            sudo mkdir -p /home/gfw && \
-            sudo chown $(whoami):$(whoami) /home/gfw && \
-            cd /home/gfw && \
-            git clone https://github.com/devclub-official/goforawalk_server .
-          else
-            cd /home/gfw
-          fi && \
+          echo ">>>>> Building Docker image using docker-compose.yml and Dockerfile..." && \
+          sudo docker compose up --build && \
 
-          echo ">>>>> Git 소스 업데이트 (fetch & reset) 중..." && \
-          git fetch origin ${BRANCH_NAME} && \
-          git reset --hard origin/${BRANCH_NAME} && \
+          echo ">>>>> (Re)Starting container using docker-compose..." && \
+          sudo docker compose up -d && \
 
-          echo ">>>>> 애플리케이션 디렉토리 (/home/gfw/backend/app-server) 로 이동 중..." && \
-          cd /home/gfw/backend/app-server && \
+          echo ">>>>> Remote deployment script finished successfully."
+    waitFor: [ 'scp-files' ] # 파일 복사 완료 후 실행
 
-          # Docker Compose를 사용하여 이미지 빌드 (Dockerfile의 BuildKit 캐시 활용)
-          echo ">>>>> Docker Compose 이미지 빌드 중..." && \
-          sudo docker compose build app-server && \
-
-          # Docker Compose를 사용하여 컨테이너 실행 (이미 빌드된 이미지 사용)
-          echo ">>>>> Docker Compose 컨테이너 실행 중..." && \
-          sudo docker compose up -d --remove-orphans app-server && \
-
-          echo ">>>>> 배포 스크립트 완료."
-        '
 options:
-  logging: CLOUD_LOGGING_ONLY  # 로그를 Cloud Logging에만 저장 (기본 로그 스토리지 비용 절감)
+  logging: CLOUD_LOGGING_ONLY # 로그는 Cloud Logging에만 저장 (스토리지 비용 절감)
