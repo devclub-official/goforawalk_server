@@ -1,4 +1,4 @@
-package side.flab.goforawalk.config
+package side.flab.goforawalk.docs
 
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
