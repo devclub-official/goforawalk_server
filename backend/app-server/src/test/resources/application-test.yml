@@ -31,3 +31,7 @@ decorator:
       enable-logging: true
       multiline: true
       logging: slf4j
+
+logging:
+  level:
+    org.springframework.security: DEBUG

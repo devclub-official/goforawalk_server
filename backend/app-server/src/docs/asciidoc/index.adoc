@@ -12,7 +12,7 @@
 
 == API 엔드포인트
 
-=== GET Hello
+=== GET Hello(배포 중)
 
 ==== 요청
 include::{snippets}/get-hello/http-request.adoc[]
@@ -20,7 +20,7 @@ include::{snippets}/get-hello/http-request.adoc[]
 ==== 응답
 include::{snippets}/get-hello/http-response.adoc[]
 
-=== POST Hello
+=== POST Hello(배포 중)
 ==== 요청
 include::{snippets}/post-hello/http-request.adoc[]
 
