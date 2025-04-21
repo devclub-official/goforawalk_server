@@ -63,7 +63,46 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-// build.gradle.kts에 추가
+// bootJar 태스크 설정 - 문서 복사 로직 직접 포함
+tasks.bootJar {
+    archiveBaseName.set("app-server")
+    archiveVersion.set("")
+
+    // asciidoctor에 의존
+    dependsOn(tasks.asciidoctor)
+
+    // JAR 패키징 직전에 문서 복사
+    doFirst {
+        println("=== 문서를 JAR에 복사합니다 ===")
+
+        // docs 디렉토리 생성
+        file("${buildDir}/resources/main/static/docs").mkdirs()
+
+        // 문서 복사
+        copy {
+            from("${tasks.asciidoctor.get().outputDir}")
+            into("${buildDir}/resources/main/static/docs")
+        }
+
+        file("${buildDir}/resources/main/static/docs/test.html").writeText(
+            "<html><body>테스트 문서 페이지</body></html>"
+        )
+    }
+}
+
+// asciidoctor 태스크 설정
+tasks.asciidoctor {
+    inputs.dir(project.extra["snippetsDir"]!!)
+    dependsOn(tasks.named("generateRestDocs"))
+
+    attributes(
+        mapOf(
+            "snippets" to project.extra["snippetsDir"],
+        )
+    )
+}
+
+// generateRestDocs 태스크 정의
 tasks.register<Test>("generateRestDocs") {
     description = "문서 생성용 테스트만 실행합니다"
     group = "documentation"
@@ -74,32 +113,4 @@ tasks.register<Test>("generateRestDocs") {
 
     // 스니펫 출력 디렉토리 설정
     outputs.dir(project.extra["snippetsDir"]!!)
-}
-
-
-tasks.asciidoctor {
-    dependsOn(tasks.named("generateRestDocs")) // 테스트 수행 후 스니펫 생성
-
-    attributes(
-        mapOf(
-            "snippets" to project.extra["snippetsDir"],
-        )
-    )
-}
-
-tasks.bootJar {
-    archiveBaseName.set("app-server")
-    archiveVersion.set("")
-
-    dependsOn(tasks.asciidoctor) // JAR 파일 생성 전 asciidoctor 문서 생성
-    doFirst {
-        // 기존 문서 삭제
-        delete("src/main/resources/static/docs")
-        
-        // 새로운 문서 복사
-        copy {
-            from("${tasks.asciidoctor.get().outputDir}")
-            into("src/main/resources/static/docs")
-        }
-    }
 }

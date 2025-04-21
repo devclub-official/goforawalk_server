@@ -46,8 +46,8 @@ steps:
         chmod +x ./gradlew && \
         
         # 테스트를 스킵하고 빌드 실행
-        echo ">>> ./gradlew bootJar" && \
-        ./gradlew bootJar && \
+        echo ">>> ./gradlew clean bootJar" && \
+        ./gradlew clean bootJar --info && \
         
         echo ">>>>> JAR 빌드 완료" \
     waitFor: [ 'checkout-source' ]
