@@ -1,1 +1,5 @@
-spring.application.name=app-server
+spring:
+  profiles:
+    group:
+      local: local, datasource
+      prod: prod, datasource
