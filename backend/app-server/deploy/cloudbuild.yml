@@ -89,7 +89,7 @@ steps:
         echo ">>>>> SCP로 파일 전송 완료..."
     waitFor: [ 'create-remote-dir' ]
 
-  # 3단계: VM 접속 후 애플리케이션 이미지 빌드 & 실행
+  # 4. VM 접속 후 애플리케이션 이미지 빌드 & 실행
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'deploy-remote'
     entrypoint: 'bash'
@@ -101,17 +101,22 @@ steps:
         gcloud compute ssh ${_SSH_USER}@${_INSTANCE_NAME} --zone=${_LOCATION} --project=${_PROJECT_ID} --command='
           set -e && 
         
-          echo ">>>>> [${_INSTANCE_NAME}] 인스턴스 접속 성공!!!" &&  
+          echo ">>>>> [${_INSTANCE_NAME}] 인스턴스 접속 성공!!!" &&
         
           echo ">>>>> 작업 디렉토리 변경 중... ${_REMOTE_DEPLOY_DIR}..." &&  
           cd ${_REMOTE_DEPLOY_DIR} &&  
-          echo "현재 디렉토리: $(pwd)" &&  
+          echo ">>>>> 현재 디렉토리: $(pwd)" &&  
         
-          echo ">>>>> 환경변수 추출 중... (DB_USER=${_DB_USER}, DB_URL=${_DB_URL})" &&
-          export ENVIRONMENT="${_ENVIRONMENT}" && \
-          export DB_USER="${_DB_USER}" && \
-          export DB_PW="${_DB_PW}" && \
-          export DB_URL="${_DB_URL}" && \
+          echo ">>>>> .env 파일 생성 중..." && \
+          cat <<EOF > .env
+          ENVIRONMENT=${_ENVIRONMENT}
+          DB_USER=${_DB_USER}
+          DB_PW=${_DB_PW}
+          DB_URL=${_DB_URL}
+          EOF && \
+          chmod 600 .env && \
+          echo ".env 파일 내용:" && \
+          cat .env && \
         
           echo ">>>>> 배포 스크립트 실행 권한 설정..." &&
           chmod +x docker-run.sh &&
