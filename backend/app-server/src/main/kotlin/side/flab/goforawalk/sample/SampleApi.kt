@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/sample")
-class SampleApi {
+class SampleApi(
+    private val sampleService: SampleService
+) {
     @GetMapping("/hello")
     fun helloWorld(): String {
         return "Hello World!"
@@ -17,6 +19,11 @@ class SampleApi {
     @PostMapping("/hello")
     fun helloWorld(@RequestBody request: HelloRequest): HelloResponse {
         return HelloResponse("Hello ${request.name}!")
+    }
+
+    @PostMapping("/")
+    fun createSample(@RequestBody request: SampleCreateRequest): SampleEntity {
+        return sampleService.createSample(request)
     }
 
     data class HelloRequest(

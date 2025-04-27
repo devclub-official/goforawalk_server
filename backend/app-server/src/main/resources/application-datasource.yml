@@ -12,10 +12,10 @@ spring:
       on-profile: prod
 
   datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
     username: ${DB_USER}
     password: ${DB_PW}
-    driver-class-name: com.mysql.jdbc.Driver
-    url: ${DB_URL}
 
 decorator:
   datasource:
@@ -30,15 +30,10 @@ spring:
       on-profile: local
 
   datasource:
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PW}
 
 decorator:
   datasource:
