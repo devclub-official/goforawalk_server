@@ -108,12 +108,10 @@ steps:
           echo ">>>>> 현재 디렉토리: $(pwd)" &&  
         
           echo ">>>>> .env 파일 생성 중..." && \
-          cat <<EOF > .env
-          ENVIRONMENT=${_ENVIRONMENT}
-          DB_USER=${_DB_USER}
-          DB_PW=${_DB_PW}
-          DB_URL=${_DB_URL}
-          EOF && \
+          echo "ENVIRONMENT=${_ENVIRONMENT}" >> .env && \
+          echo "DB_USER=${_DB_USER}" >> .env && \
+          echo "DB_PW=${_DB_PW}" >> .env && \
+          echo "DB_URL=${_DB_URL}" >> .env && \
           chmod 600 .env && \
           echo ".env 파일 내용:" && \
           cat .env && \
