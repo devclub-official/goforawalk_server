@@ -1,0 +1,15 @@
+services:
+  app-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: app-server:latest
+    container_name: app-server-container
+    restart: always
+    ports:
+      - "8080:8080" # 호스트 포트:컨테이너 포트
+    environment:
+      - SPRING_PROFILES_ACTIVE=${ENVIRONMENT}
+      - DB_USER=${DB_USER}
+      - DB_PW=${DB_PW}
+      - DB_URL=${DB_URL}
