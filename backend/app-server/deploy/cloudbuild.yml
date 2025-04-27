@@ -86,9 +86,9 @@ steps:
           --zone=${_LOCATION} \
           --recurse \
           ${_SOURCE_DIR}/build/libs/app-server.jar \
-          ${_SOURCE_DIR}/docker-remote/Dockerfile \
-          ${_SOURCE_DIR}/docker-remote/docker-compose.yml \
-          ${_SOURCE_DIR}/docker-remote/docker-run.sh \
+          ${_SOURCE_DIR}/deploy/Dockerfile \
+          ${_SOURCE_DIR}/deploy/docker-compose.yml \
+          ${_SOURCE_DIR}/deploy/docker-run.sh \
           ${_SSH_USER}@${_INSTANCE_NAME}:${_REMOTE_DEPLOY_DIR} && \
         
         echo ">>>>> SCP로 파일 전송 완료!!!"

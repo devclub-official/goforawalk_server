@@ -2,7 +2,7 @@
 services:
   app-server: # 서비스 이름
     build: # 빌드 설정
-      context: .
+      context: ../docker-remote
       dockerfile: Dockerfile
     image: app-server:latest # 로컬에서 빌드될 이미지 이름과 태그
     container_name: app-server-container # 실행될 컨테이너 이름
