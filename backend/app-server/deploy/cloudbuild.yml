@@ -107,7 +107,7 @@ steps:
           cd ${_REMOTE_DEPLOY_DIR} &&  
           echo "현재 디렉토리: $(pwd)" &&  
         
-          echo ">>>>> 환경변수 추출 중... (DB_USER=${_DB_USER})" &&
+          echo ">>>>> 환경변수 추출 중... (DB_USER=${_DB_USER}, DB_URL=${_DB_URL})" &&
           export ENVIRONMENT="${_ENVIRONMENT}" && \
           export DB_USER="${_DB_USER}" && \
           export DB_PW="${_DB_PW}" && \

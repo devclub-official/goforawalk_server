@@ -3,6 +3,10 @@ spring:
     activate:
       on-profile: prod
 
+  output:
+    ansi:
+      enabled: always
+
 decorator:
   datasource:
     p6spy:
