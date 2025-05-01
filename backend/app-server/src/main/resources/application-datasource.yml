@@ -4,18 +4,18 @@ spring:
     hibernate:
       ddl-auto: validate
 
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PW}
+
 ---
 
 spring:
   config:
     activate:
       on-profile: prod
-
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PW}
 
 decorator:
   datasource:
@@ -29,11 +29,6 @@ spring:
     activate:
       on-profile: local
 
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PW}
 
 decorator:
   datasource:
