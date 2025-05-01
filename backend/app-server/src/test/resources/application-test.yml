@@ -32,6 +32,17 @@ decorator:
       multiline: true
       logging: slf4j
 
-logging:
-  level:
-    org.springframework.security: DEBUG
+#logging:
+#  level:
+#    org.springframework.security: DEBUG
+
+app:
+  security:
+    oauth2:
+      registration:
+        KAKAO:
+          app-key: "KAKAO_APP_KEY"
+        APPLE:
+          app-key: "APPLE_APP_KEY"
+    jwt:
+      secret-key: "SECRET_KEY"

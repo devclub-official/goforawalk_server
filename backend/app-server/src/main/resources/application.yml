@@ -3,3 +3,14 @@ spring:
     group:
       local: local, datasource
       prod: prod, datasource
+
+app:
+  security:
+    oauth2:
+      registration:
+        KAKAO:
+          app-key: ${KAKAO_APP_KEY}
+        APPLE:
+          app-key: ${APPLE_APP_KEY}
+    jwt:
+      secret-key: ${SECRET_KEY}
