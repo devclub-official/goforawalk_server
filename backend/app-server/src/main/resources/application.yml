@@ -4,13 +4,18 @@ spring:
       local: local, datasource
       prod: prod, datasource
 
-app:
+  # Spring Security
   security:
     oauth2:
-      registration:
-        KAKAO:
-          app-key: ${KAKAO_APP_KEY}
-        APPLE:
-          app-key: ${APPLE_APP_KEY}
-    jwt:
-      secret-key: ${SECRET_KEY}
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID} # idToken.aud에 해당
+        provider:
+          kakao:
+            issuer-uri: "https://kauth.kakao.com"
+            jwk-set-uri: "https://kauth.kakao.com/.well-known/jwks.json"
+
+#app:
+#  jwt:
+#    secret-key: ${APP_SECRET_KEY}

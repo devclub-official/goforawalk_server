@@ -20,10 +20,28 @@ spring:
         format_sql: true
 #        show_sql: true
 
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: "KAKAO_CLIENT_ID" # idToken.aud에 해당
+        provider:
+          kakao:
+            issuer-uri: "https://kauth.kakao.com"
+            jwk-set-uri: "http://localhost:8089/kakao/.well-known/jwks.json"
 
   output:
     ansi:
       enabled: always
+
+logging:
+  level:
+    org.springframework.security.oauth2.jwt: DEBUG
+    org.springframework.security: DEBUG
+    com.nimbusds.jose.jwk.source: DEBUG
+    org.springframework.web.client.RestTemplate: TRACE
+    org.apache.http.wire: TRACE
 
 decorator:
   datasource:
@@ -32,17 +50,3 @@ decorator:
       multiline: true
       logging: slf4j
 
-#logging:
-#  level:
-#    org.springframework.security: DEBUG
-
-app:
-  security:
-    oauth2:
-      registration:
-        KAKAO:
-          app-key: "KAKAO_APP_KEY"
-        APPLE:
-          app-key: "APPLE_APP_KEY"
-    jwt:
-      secret-key: "SECRET_KEY"

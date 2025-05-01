@@ -13,7 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 private val log = KotlinLogging.logger {}
 
-class OAuth2OidcLoginAuthenticationFilter(
+class OidcLoginAuthenticationFilter(
     private val objectMapper: ObjectMapper,
     private val authenticationManager: AuthenticationManager,
 ) : OncePerRequestFilter() {
@@ -33,20 +33,19 @@ class OAuth2OidcLoginAuthenticationFilter(
             filterChain.doFilter(request, response)
             return
         }
-        
-        
+
         val authentication = generateAuthRequest(request)
         val authResult = authenticationManager.authenticate(authentication)
 
         // todo return success response
     }
 
-    private fun generateAuthRequest(request: HttpServletRequest): OAuth2OidcAuthenticationToken {
+    private fun generateAuthRequest(request: HttpServletRequest): OidcAuthenticationToken {
         val provider = OAuth2Provider.valueOf(extractProvider(request))
-        val idToken = objectMapper.readValue(request.inputStream, IdToken::class.java)
-        log.info { "OIDC Login request: provider=$provider & idToken=${idToken.idToken}" }
+        val loginRequest = objectMapper.readValue(request.inputStream, OidcLoginRequest::class.java)
+        log.info { "OIDC Login request: provider=$provider & idToken=${loginRequest.idToken}" }
 
-        return OAuth2OidcAuthenticationToken(idToken, provider)
+        return OidcAuthenticationToken(loginRequest.toIdToken(), provider)
     }
 
     private fun extractProvider(request: HttpServletRequest): String {

@@ -1,5 +1,5 @@
 package side.flab.goforawalk.security.oauth2
 
 data class IdToken(
-    val idToken: String,
+    val value: String,
 )

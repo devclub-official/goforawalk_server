@@ -1,14 +1,11 @@
 package side.flab.goforawalk
 
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
+import side.flab.goforawalk.support.BaseIntegrationTest
 
-@SpringBootTest
-class GoforawalkApplicationTests {
-
+class GoforawalkApplicationTests : BaseIntegrationTest() {
     @Test
     fun contextLoads() {
         println("test")
     }
-
 }
