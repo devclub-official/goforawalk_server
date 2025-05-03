@@ -22,7 +22,7 @@ class OidcAuthenticationProvider(
         try {
             val idTokenValidator = idTokenValidatorFactory.getValidatorBy(token.provider)
             val idToken = idTokenValidator.validate(token)
-            log.info { "Validated id token: $idToken" }
+            log.info { "${token.provider} id token validated: ${idToken.headers} ${idToken.claims}" }
 //            TODO("add user service")
             token.markAsAuthenticated()
         } catch (e: RuntimeException) {
