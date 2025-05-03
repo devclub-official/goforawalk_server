@@ -10,7 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import side.flab.goforawalk.security.oauth2.OidcAuthenticationProvider
-import side.flab.goforawalk.security.oauth2.OidcIdTokenValidatorFactory
+import side.flab.goforawalk.security.oauth2.validator.OidcIdTokenValidatorFactory
 import side.flab.goforawalk.security.oauth2.OidcLoginAuthenticationFilter
 
 @Configuration
