@@ -37,7 +37,7 @@ class OidcLoginAuthenticationFilter(
         val authentication = generateAuthRequest(request)
         val authResult = authenticationManager.authenticate(authentication)
 
-        // todo return success response
+        
     }
 
     private fun generateAuthRequest(request: HttpServletRequest): OidcAuthenticationToken {

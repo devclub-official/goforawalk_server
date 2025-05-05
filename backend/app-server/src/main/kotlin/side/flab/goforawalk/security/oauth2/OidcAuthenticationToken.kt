@@ -10,16 +10,4 @@ class OidcAuthenticationToken(
     override fun getCredentials(): Any = idToken
 
     override fun getPrincipal(): Any = provider
-
-    fun equalsProvider(provider: OAuth2Provider): Boolean {
-        return this.provider == provider
-    }
-
-    fun markAsAuthenticated() {
-        isAuthenticated = true
-    }
-
-    fun markAsUnAuthenticated() {
-        isAuthenticated = false
-    }
 }

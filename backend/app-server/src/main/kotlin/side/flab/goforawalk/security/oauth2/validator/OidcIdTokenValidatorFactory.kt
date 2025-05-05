@@ -1,9 +1,7 @@
 package side.flab.goforawalk.security.oauth2.validator
 
-import org.springframework.stereotype.Component
 import side.flab.goforawalk.security.oauth2.OAuth2Provider
 
-@Component
 class OidcIdTokenValidatorFactory(
     validatorsSet: Set<OidcIdTokenValidator>
 ) {
