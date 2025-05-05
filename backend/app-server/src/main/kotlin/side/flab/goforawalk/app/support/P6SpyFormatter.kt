@@ -18,7 +18,7 @@ class P6SpyFormatter : MessageFormattingStrategy {
             now + "|" + elapsed + "ms|" + category + "|connection " + connectionId + "|" + prepared
         } else {
             val formattedSql = formatSql(sql)
-            now + "\n" + formattedSql
+            now + "\n" + formattedSql + "\n"
         }
     }
 
