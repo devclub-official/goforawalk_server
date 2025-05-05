@@ -26,12 +26,11 @@ class SecurityConfig {
             .csrf { csrf -> csrf.disable() }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/docs", "/sample/**").permitAll()
+                    .requestMatchers("/docs/**", "/sample/**", "/error").permitAll()
                     .anyRequest().authenticated()
             }
-            // todo add successHandler, failureHandler
             .addFilterBefore(oidcLoginAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
-            .authenticationProvider(oidcAuthenticationProvider) // todo oidcAuthenticationProvider를 직접 등록 하지 않도록 수정
+            .authenticationProvider(oidcAuthenticationProvider)
 
         return http.build()
     }
