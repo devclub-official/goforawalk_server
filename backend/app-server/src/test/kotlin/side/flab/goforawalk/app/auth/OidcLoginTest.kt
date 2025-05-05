@@ -2,6 +2,8 @@ package side.flab.goforawalk.app.auth
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.restassured.module.mockmvc.RestAssuredMockMvc.given
+import org.hamcrest.CoreMatchers.*
+import org.hamcrest.Matchers.emptyString
 import org.springframework.core.io.ClassPathResource
 import side.flab.goforawalk.app.support.BaseRestAssuredTest
 import side.flab.goforawalk.security.oauth2.OAuth2Provider
@@ -11,7 +13,6 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class OidcLoginTest : BaseRestAssuredTest() {
-    
     @BeforeTest
     fun setUpOidc() {
         stubFor(
@@ -30,6 +31,7 @@ class OidcLoginTest : BaseRestAssuredTest() {
         val loginRequest = OidcLoginRequest(sampleIdToken())
 
         val response = given()
+            .log().all()
             .body(loginRequest)
             .contentType("application/json")
             .`when`()
@@ -37,7 +39,16 @@ class OidcLoginTest : BaseRestAssuredTest() {
 
         response
             .then()
+            .log().all()
             .statusCode(200)
+            .body("data", notNullValue())
+            .body("data.userId", isA(Int::class.java))
+            .body("data.credentials", notNullValue())
+            .body("data.credentials.accessToken", not(emptyString()))
+            .body("data.credentials.refreshToken", not(emptyString()))
+            .body("data.userInfo", notNullValue())
+            .body("data.userInfo.email", anyOf(notNullValue(), nullValue()))
+            .body("data.userInfo.nickname", not(emptyString()))
     }
 
     private fun sampleIdToken(): String =

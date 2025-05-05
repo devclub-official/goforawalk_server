@@ -2,6 +2,7 @@ package side.flab.goforawalk.security.oauth2
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.security.authentication.AuthenticationProvider
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.jwt.Jwt
@@ -9,11 +10,11 @@ import side.flab.goforawalk.security.oauth2.validator.OidcIdTokenValidatorFactor
 
 private val log = KotlinLogging.logger {}
 
-
 class OidcAuthenticationProvider(
     private val idTokenValidatorFactory: OidcIdTokenValidatorFactory,
-    private val userService: OidcUserService
+    private val userService: OidcUserService,
 ) : AuthenticationProvider {
+
     override fun supports(authentication: Class<*>) =
         OidcAuthenticationToken::class.java.isAssignableFrom(authentication)
 
@@ -22,7 +23,8 @@ class OidcAuthenticationProvider(
 
         try {
             val validatedIdToken = validateIdToken(token)
-            val userDetails = userService.loadUser(OidcUserInfo(token.provider, validatedIdToken.claims["sub"] as String))
+            val userDetails =
+                userService.loadUser(OidcUserInfo(token.provider, validatedIdToken.claims["sub"] as String))
 
             return UsernamePasswordAuthenticationToken.authenticated(
                 userDetails,
@@ -30,8 +32,7 @@ class OidcAuthenticationProvider(
                 emptyList()
             )
         } catch (e: RuntimeException) {
-            log.warn(e) { "Failed to validate id token: $e" }
-            return UsernamePasswordAuthenticationToken.unauthenticated(null, null)
+            throw BadCredentialsException("Failed to validate id token: ${e.message}", e)
         }
     }
 

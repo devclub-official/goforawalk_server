@@ -1,6 +1,5 @@
 package side.flab.goforawalk.security.oauth2
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -17,16 +16,8 @@ class OidcSecurityConfig {
     @Bean
     fun oAuth2OidcAuthenticationProvider(
         idTokenValidatorFactory: OidcIdTokenValidatorFactory,
-        userService: OidcUserService
+        userService: OidcUserService,
     ): OidcAuthenticationProvider {
         return OidcAuthenticationProvider(idTokenValidatorFactory, userService)
-    }
-
-    @Bean
-    fun oauth2OidcLoginAuthenticationFilter(
-        objectMapper: ObjectMapper,
-        authenticationManager: AuthenticationManager,
-    ): OidcLoginAuthenticationFilter {
-        return OidcLoginAuthenticationFilter(objectMapper, authenticationManager)
     }
 }

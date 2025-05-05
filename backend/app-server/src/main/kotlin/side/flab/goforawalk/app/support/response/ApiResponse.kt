@@ -1,4 +1,5 @@
 package side.flab.goforawalk.app.support.response
 
-class ApiResponse {
-}
+data class ApiResponse<T>(
+    val data: T
+)

@@ -35,6 +35,16 @@ spring:
     ansi:
       enabled: always
 
+app:
+  jwt:
+    issuer: "api.goforawalk.site"
+    user-name-attribute: "sub"
+    at-secret-key: "JWT_AT_SECRET_KEY_MUST_HAVE_A_SIZE_GREATER_THAN_256_BITS"
+    rt-secret-key: "JWT_RT_SECRET_KEY_MUST_HAVE_A_SIZE_GREATER_THAN_256_BITS"
+    at-expiration-seconds: 600
+    rt-expiration-seconds: 1200
+
+
 logging:
   level:
     org.springframework.security.oauth2.jwt: DEBUG

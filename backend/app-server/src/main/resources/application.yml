@@ -16,6 +16,13 @@ spring:
             issuer-uri: "https://kauth.kakao.com"
             jwk-set-uri: "https://kauth.kakao.com/.well-known/jwks.json"
 
-#app:
-#  jwt:
-#    secret-key: ${APP_SECRET_KEY}
+
+app:
+  jwt:
+    issuer: "api.goforawalk.site"
+    user-name-attribute: "sub"
+    at-secret-key: ${JWT_AT_SECRET_KEY}
+    rt-secret-key: ${JWT_RT_SECRET_KEY}
+    at-expiration-seconds: ${JWT_AT_EXPIRATION_SECONDS}
+    rt-expiration-seconds: ${JWT_RT_EXPIRATION_SECONDS}
+

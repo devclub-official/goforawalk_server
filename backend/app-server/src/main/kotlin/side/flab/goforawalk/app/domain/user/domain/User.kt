@@ -67,4 +67,15 @@ class User private constructor(
     fun changeNickname(newNickname: String) {
         this.nickname = newNickname
     }
+
+    override fun toString(): String {
+        return "User(" +
+                "id=$id, " +
+                "email=$email, " +
+                "provider=$provider, " +
+                "providerUsername='$providerUsername', " +
+                "role=$role, " +
+                "nickname='$nickname'" +
+                ")"
+    }
 }
