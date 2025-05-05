@@ -17,10 +17,8 @@ class UserRepositoryTest : BaseIntegrationTest() {
     @Test
     fun save() {
         val user = User(
-            nickname = "test",
             provider = OAuth2Provider.APPLE,
             providerUsername = "testProviderId",
-            role = UserRole.USER
         )
 
         val actual = sut.save(user)

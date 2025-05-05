@@ -27,7 +27,7 @@ class OidcAuthenticationProvider(
             return UsernamePasswordAuthenticationToken.authenticated(
                 userDetails,
                 null,
-                userDetails.getAuthorities()
+                emptyList()
             )
         } catch (e: RuntimeException) {
             log.warn(e) { "Failed to validate id token: $e" }

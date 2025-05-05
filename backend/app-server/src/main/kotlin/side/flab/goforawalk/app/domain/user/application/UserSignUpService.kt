@@ -1,25 +1,30 @@
 package side.flab.goforawalk.app.domain.user.application
 
 import org.springframework.stereotype.Service
+import side.flab.goforawalk.app.domain.user.domain.User
 import side.flab.goforawalk.app.domain.user.domain.UserRepository
 import side.flab.goforawalk.security.UserDetails
 import side.flab.goforawalk.security.oauth2.OidcUserInfo
 import side.flab.goforawalk.security.oauth2.OidcUserService
 
 @Service
-class UserSignUpService (
+class UserSignUpService(
     private val userRepository: UserRepository,
 ) : OidcUserService {
-
     override fun loadUser(userInfo: OidcUserInfo): UserDetails {
-        TODO("Not yet implemented")
-        // if already signed up, return user
-        // find by provider username, provider
-        userRepository.findByProviderAndProviderUsername(userInfo.provider, userInfo.providerUsername)
+        val user = userRepository.findByProviderAndProviderUsername(
+            userInfo.provider,
+            userInfo.providerUsername
+        ) ?: createUser(userInfo)
 
+        return AppUserDetails(user.id!!)
+    }
 
-        // if exists, return user
-
-        // if not exists, create new user
+    private fun createUser(userInfo: OidcUserInfo): User {
+        val user = User(
+            provider = userInfo.provider,
+            providerUsername = userInfo.providerUsername,
+        )
+        return userRepository.save(user)
     }
 }
