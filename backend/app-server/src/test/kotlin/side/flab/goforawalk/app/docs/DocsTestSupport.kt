@@ -1,16 +1,20 @@
 package side.flab.goforawalk.app.docs
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Tag
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler
+import side.flab.goforawalk.app.support.BaseRestAssuredTest
 
 @Tag("restdocs")
-@WebMvcTest(
-    excludeAutoConfiguration = [SecurityAutoConfiguration::class]
-)
 @AutoConfigureRestDocs
 @Import(RestDocsConfiguration::class)
-abstract class DocsTestSupport {
+abstract class DocsTestSupport : BaseRestAssuredTest() {
+    @Autowired
+    lateinit var objectMapper: ObjectMapper
+
+    @Autowired
+    lateinit var docs: RestDocumentationResultHandler
 }

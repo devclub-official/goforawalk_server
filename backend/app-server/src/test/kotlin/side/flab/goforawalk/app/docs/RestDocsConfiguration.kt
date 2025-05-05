@@ -17,12 +17,18 @@ class RestDocsConfiguration {
                 Preprocessors.prettyPrint(),
                 Preprocessors.modifyHeaders()
                     .remove("Content-Length")
-                    .set("Host", "https://api.goforawalk.site")
+                    .remove("Host")
             ),
             Preprocessors.preprocessResponse(
                 Preprocessors.prettyPrint(),
                 Preprocessors.modifyHeaders()
                     .remove("Content-Length")
+                    .remove("X-Content-Type-Options")
+                    .remove("X-XSS-Protection")
+                    .remove("Cache-Control")
+                    .remove("Pragma")
+                    .remove("Expires")
+                    .remove("X-Frame-Options")
             )
         )
     }
