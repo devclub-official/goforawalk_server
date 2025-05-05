@@ -40,13 +40,14 @@ class SecurityConfig {
     fun oauth2OidcLoginAuthenticationFilter(
         objectMapper: ObjectMapper,
         authenticationManager: AuthenticationManager,
-        userLoginSuccessHandler: UserLoginSuccessHandler
+        userLoginSuccessHandler: UserLoginSuccessHandler,
+        userLoginFailureHandler: UserLoginFailureHandler
     ): OidcLoginAuthenticationFilter {
         return OidcLoginAuthenticationFilter(
             objectMapper,
             authenticationManager,
             userLoginSuccessHandler,
-            UserLoginFailureHandler(),
+            userLoginFailureHandler
         )
     }
 }

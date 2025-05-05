@@ -4,14 +4,17 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.restassured.module.mockmvc.RestAssuredMockMvc.given
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Matchers.emptyString
+import org.hamcrest.Matchers.`is`
 import org.springframework.core.io.ClassPathResource
 import side.flab.goforawalk.app.support.BaseRestAssuredTest
+import side.flab.goforawalk.app.support.error.ApiErrorCode
 import side.flab.goforawalk.security.oauth2.OAuth2Provider
 import side.flab.goforawalk.security.oauth2.OidcLoginRequest
 import java.nio.charset.StandardCharsets
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
+@Suppress("NonAsciiCharacters")
 class OidcLoginTest : BaseRestAssuredTest() {
     @BeforeTest
     fun setUpOidc() {
@@ -26,7 +29,7 @@ class OidcLoginTest : BaseRestAssuredTest() {
     }
 
     @Test
-    fun `KAKAO 제공자로 OIDC 로그인 요청 시 인증 성공해야 한다`() {
+    fun `OIDC 로그인 - 카카오 성공`() {
         val provider = OAuth2Provider.KAKAO
         val loginRequest = OidcLoginRequest(sampleIdToken())
 
@@ -49,6 +52,26 @@ class OidcLoginTest : BaseRestAssuredTest() {
             .body("data.userInfo", notNullValue())
             .body("data.userInfo.email", anyOf(notNullValue(), nullValue()))
             .body("data.userInfo.nickname", not(emptyString()))
+    }
+
+    @Test
+    fun `OIDC 로그인 - 카카오 실패`() {
+        val provider = OAuth2Provider.KAKAO
+        val loginRequest = OidcLoginRequest("invalid_id_token")
+
+        val response = given()
+            .log().all()
+            .body(loginRequest)
+            .contentType("application/json")
+            .`when`()
+            .post("/api/v1/auth/login/oauth2/{provider}", provider)
+
+        response
+            .then()
+            .log().all()
+            .statusCode(401)
+            .body("code", `is`(ApiErrorCode.A_4100.name))
+            .body("message", not(emptyString()))
     }
 
     private fun sampleIdToken(): String =
