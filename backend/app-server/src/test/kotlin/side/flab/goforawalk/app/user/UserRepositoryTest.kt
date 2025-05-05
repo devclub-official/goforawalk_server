@@ -30,7 +30,6 @@ class UserRepositoryTest : BaseIntegrationTest() {
 
     @Test
     fun findByProviderAndProviderUsername() {
-        // given
         val user = User(
             provider = OAuth2Provider.KAKAO,
             providerUsername = "provider_username",
@@ -46,5 +45,14 @@ class UserRepositoryTest : BaseIntegrationTest() {
             assertThat(this.provider).isEqualTo(OAuth2Provider.KAKAO)
             assertThat(this.providerUsername).isEqualTo("provider_username")
         }
+    }
+
+    @Test
+    fun findByProviderAndProviderUsername_no_user() {
+        val userFound = sut.findByProviderAndProviderUsername(
+            provider = OAuth2Provider.KAKAO,
+            providerUsername = "provider_username",
+        )
+        assertThat(userFound).isNull()
     }
 }
