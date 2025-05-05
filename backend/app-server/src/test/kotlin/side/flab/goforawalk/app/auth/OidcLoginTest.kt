@@ -2,7 +2,6 @@ package side.flab.goforawalk.app.auth
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.restassured.module.mockmvc.RestAssuredMockMvc.given
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.core.io.ClassPathResource
 import side.flab.goforawalk.app.support.BaseRestAssuredTest
 import side.flab.goforawalk.security.oauth2.OAuth2Provider
@@ -11,8 +10,7 @@ import java.nio.charset.StandardCharsets
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-@AutoConfigureWireMock(port = 8089)
-class OidcAuthenticationTest : BaseRestAssuredTest() {
+class OidcLoginTest : BaseRestAssuredTest() {
     
     @BeforeTest
     fun setUpOidc() {
