@@ -2,3 +2,11 @@ spring:
   config:
     activate:
       on-profile: local
+
+logging:
+  level:
+    org.springframework.security.oauth2.jwt: DEBUG
+    org.springframework.security: DEBUG
+    com.nimbusds.jose.jwk.source: DEBUG
+    org.springframework.web.client.RestTemplate: TRACE
+    org.apache.http.wire: TRACE
