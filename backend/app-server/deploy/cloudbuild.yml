@@ -112,6 +112,11 @@ steps:
           echo "DB_USER=${_DB_USER}" >> .env && \
           echo "DB_PW=${_DB_PW}" >> .env && \
           echo "DB_URL=${_DB_URL}" >> .env && \
+          echo "KAKAO_CLIENT_ID=${_KAKAO_CLIENT_ID}" >> .env && \
+          echo "JWT_AT_SECRET_KEY=${_JWT_AT_SECRET_KEY}" >> .env && \
+          echo "JWT_RT_SECRET_KEY=${_JWT_RT_SECRET_KEY}" >> .env && \
+          echo "JWT_AT_EXPIRATION_SECONDS=${_JWT_AT_EXPIRATION_SECONDS}" >> .env && \
+          echo "JWT_RT_EXPIRATION_SECONDS=${_JWT_RT_EXPIRATION_SECONDS}" >> .env && \
           chmod 600 .env && \
           echo ".env 파일 내용:" && \
           cat .env && \

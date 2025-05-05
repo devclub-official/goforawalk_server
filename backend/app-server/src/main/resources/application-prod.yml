@@ -6,10 +6,3 @@ spring:
   output:
     ansi:
       enabled: always
-
-decorator:
-  datasource:
-    p6spy:
-      enable-logging: false
-      multiline: true
-      logging: slf4j

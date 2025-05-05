@@ -29,21 +29,44 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("com.github.ben-manes.caffeine:caffeine")
+
     // Spring Security
-//    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 
     runtimeOnly("com.h2database:h2")
     runtimeOnly("com.mysql:mysql-connector-j")
 
-    // test
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
+
+    implementation("io.jsonwebtoken:jjwt-api:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
+
+    /**
+     * test
+     */
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 
+    // wiremock
+    testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:4.1.4")
+
+    // rest-assured
+    testImplementation("io.rest-assured:rest-assured:5.5.1")
+    testImplementation("io.rest-assured:spring-mock-mvc:5.5.1")
+
+    // restdocs
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
 
+    /**
+     * utils
+     */
     implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0")
 }
 

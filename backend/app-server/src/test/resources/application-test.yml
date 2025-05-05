@@ -20,10 +20,38 @@ spring:
         format_sql: true
 #        show_sql: true
 
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: "KAKAO_CLIENT_ID" # idToken.aud에 해당
+        provider:
+          kakao:
+            issuer-uri: "https://kauth.kakao.com"
+            jwk-set-uri: "http://localhost:8089/kakao/.well-known/jwks.json"
 
   output:
     ansi:
       enabled: always
+
+app:
+  jwt:
+    issuer: "api.goforawalk.site"
+    user-name-attribute: "sub"
+    at-secret-key: "JWT_AT_SECRET_KEY_MUST_HAVE_A_SIZE_GREATER_THAN_256_BITS"
+    rt-secret-key: "JWT_RT_SECRET_KEY_MUST_HAVE_A_SIZE_GREATER_THAN_256_BITS"
+    at-expiration-seconds: 600
+    rt-expiration-seconds: 1200
+
+
+logging:
+  level:
+    org.springframework.security.oauth2.jwt: DEBUG
+    org.springframework.security: DEBUG
+    com.nimbusds.jose.jwk.source: DEBUG
+    org.springframework.web.client.RestTemplate: TRACE
+    org.apache.http.wire: TRACE
 
 decorator:
   datasource:
@@ -31,3 +59,4 @@ decorator:
       enable-logging: true
       multiline: true
       logging: slf4j
+
