@@ -1,3 +1,10 @@
+create table sample
+(
+    id   bigint auto_increment,
+    name varchar(10) not null,
+    primary key (id)
+);
+
 create table users
 (
     id                bigint auto_increment,
