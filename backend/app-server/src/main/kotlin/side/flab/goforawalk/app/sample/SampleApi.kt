@@ -1,6 +1,8 @@
 package side.flab.goforawalk.app.sample
 
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/sample")
@@ -20,6 +22,13 @@ class SampleApi(
     @PostMapping("/")
     fun createSample(@RequestBody request: SampleCreateRequest): SampleEntity {
         return sampleService.createSample(request)
+    }
+
+    @PostMapping("/upload-image")
+    fun uploadSampleImage(
+        @RequestParam file: MultipartFile,
+    ): HelloResponse {
+        return HelloResponse("file '${file.originalFilename}' uploaded successfully!")
     }
 
     data class HelloRequest(
