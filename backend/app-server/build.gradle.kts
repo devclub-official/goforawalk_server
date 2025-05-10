@@ -47,6 +47,10 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
 
+    // GCP
+    implementation("com.google.cloud:google-cloud-storage") // https://spring.io/projects/spring-cloud-gcp
+//    implementation("org.springframework.cloud:spring-cloud-gcp-storage:1.2.8.RELEASE")
+
     /**
      * test
      */
@@ -73,6 +77,7 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+        mavenBom("com.google.cloud:libraries-bom:26.59.0") // GCP BOM
     }
 }
 
